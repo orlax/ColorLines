@@ -6,8 +6,9 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class LaserEmisor : MonoBehaviour
 {
-    LineRenderer Laser;
-    List<Vector3> Positions;
+
+
+    [Header("Laser Control")]
     [SerializeField]
     float maxLaserLength = 20;
     [SerializeField]
@@ -17,7 +18,10 @@ public class LaserEmisor : MonoBehaviour
     [SerializeField]
     LaserDirection Direction = LaserDirection.UP;
 
-    List<Collider2D> HitColliders; 
+    LineRenderer Laser;
+    List<Vector3> Positions;
+    List<Collider2D> HitColliders;
+    ILaser laserObject; 
 
     private enum LaserDirection
     {
@@ -60,11 +64,17 @@ public class LaserEmisor : MonoBehaviour
             {
                 BounceLaser(hit.collider.gameObject.transform); 
             }
+            //de lo contrario, golpeamos un objeto que implementa ILaser? 
+            else
+            {
+                HitLaserObject(hit); 
+            }
         }
-        //si no hubo golpes el laser sigue de largo. 
+        //si no hubo golpes el laser sigue de largo y si tenemos un laser object lo eliminamos 
         else
         {
             Positions.Add(transform.position + (Vector3)(GetlaserDirection() * maxLaserLength) + Zoffset);
+            HitLaserObject(hit);
         }
     }
     /// <summary>
@@ -84,13 +94,44 @@ public class LaserEmisor : MonoBehaviour
             {
                 BounceLaser(hit.collider.gameObject.transform);
             }
+            else
+            {
+                HitLaserObject(hit);
+            }
         }
         else
         {
-            Positions.Add(reflector.position + (reflector.up * maxLaserLength)); 
+            Positions.Add(reflector.position + (reflector.up * maxLaserLength));
+            HitLaserObject(hit);
         }
     }
-
+    
+    /// <summary>
+    /// Revisa si el hit llego a un objeto que pueda recibir el laser y llama a las funciones adecuadas, 
+    /// si no hubo hits limpia la variable de laserObject 
+    /// </summary>
+    /// <param name="hit"></param>
+    private void HitLaserObject(RaycastHit2D hit)
+    {
+        if (hit.collider != null)
+        {
+            ILaser newLaserObject = hit.collider.gameObject.GetComponent<ILaser>();
+            if (newLaserObject != null)
+            {
+                if (laserObject != null) laserObject.GetLaser(false); // si tenemos un objeto laser previo, este ya no recibe el laser. 
+                newLaserObject.GetLaser(true); // el nuevo objeto si lo recibe. 
+                laserObject = newLaserObject;
+            }
+        }
+        else
+        {
+            if (laserObject != null)
+            {
+                laserObject.GetLaser(false);
+                laserObject = null;
+            }
+        }
+    }
     private Vector2 GetlaserDirection()
     {
         switch (Direction)
