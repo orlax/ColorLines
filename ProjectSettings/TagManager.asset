@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - reflector
+  - emisor
+  - wall
   layers:
   - Default
   - TransparentFX

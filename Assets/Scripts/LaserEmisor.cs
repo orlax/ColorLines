@@ -18,10 +18,12 @@ public class LaserEmisor : MonoBehaviour
     [SerializeField]
     LaserDirection Direction = LaserDirection.UP;
 
-    LineRenderer Laser;
-    List<Vector3> Positions;
+    protected LineRenderer Laser;
+    public List<Vector3> Positions;
     List<Collider2D> HitColliders;
-    ILaser laserObject; 
+    ILaser laserObject;
+
+    public bool LaserActive = true; 
 
     private enum LaserDirection
     {
@@ -37,16 +39,19 @@ public class LaserEmisor : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        CastLaserRay(); 
-        UpdateLineRenderer(); 
-        UpdateRotation(); 
+        if (LaserActive)
+        {
+            CastLaserRay(); 
+            UpdateLineRenderer(); 
+            UpdateRotation(); 
+        }
     }
 
     /// <summary>
     /// Realiza los Raycasts adecuados,  actualiza el array de puntos para dibujar el laser 
     /// y llama a las funciones adecuadas dependiendo de los objetos golpeados. 
     /// </summary>
-    private void CastLaserRay()
+    protected void CastLaserRay()
     {
         //reiniciamos las pocisiones 
         HitColliders = new List<Collider2D>();
@@ -57,8 +62,16 @@ public class LaserEmisor : MonoBehaviour
         //si golpeamos algo el segundo punto es igual al lugar del hit. 
         if(hit.collider != null)
         {
-            HitColliders.Add(hit.collider); 
-            Positions.Add(hit.collider.transform.position + Zoffset);
+            HitColliders.Add(hit.collider);
+            //si golpeamos una barrera el laser se queda en la posicion del hit, 
+            //de lo contrario se queda en la pocision del objeto que fue golpeado. 
+            if (hit.collider.gameObject.CompareTag("wall"))
+            {
+                Positions.Add(hit.point);
+            }else
+            {
+                Positions.Add(hit.collider.transform.position + Zoffset);
+            }
             //golpeamos un reflector?
             if (hit.collider.gameObject.CompareTag("reflector"))
             {
@@ -87,8 +100,19 @@ public class LaserEmisor : MonoBehaviour
         RaycastHit2D hit = Physics2D.Raycast(reflector.position + reflector.up * 2, reflector.up, maxLaserLength);
         if (hit.collider != null && !HitColliders.Contains(hit.collider))
         {
-            HitColliders.Add(hit.collider); 
-            Positions.Add(hit.collider.transform.position + Zoffset);
+            HitColliders.Add(hit.collider);
+
+            //si golpeamos una barrera el laser se queda en la posicion del hit, 
+            //de lo contrario se queda en la pocision del objeto que fue golpeado. 
+            if (hit.collider.gameObject.CompareTag("wall"))
+            {
+                Positions.Add((Vector3)hit.point + Zoffset * 10);
+            }
+            else
+            {
+                Positions.Add(hit.collider.transform.position + Zoffset);
+            }
+            
             //golpeamos un reflector?
             if (hit.collider.gameObject.CompareTag("reflector"))
             {
@@ -132,7 +156,7 @@ public class LaserEmisor : MonoBehaviour
             }
         }
     }
-    private Vector2 GetlaserDirection()
+    public virtual Vector2 GetlaserDirection()
     {
         switch (Direction)
         {
