@@ -62,26 +62,7 @@ public class LaserEmisor : MonoBehaviour
         //si golpeamos algo el segundo punto es igual al lugar del hit. 
         if(hit.collider != null)
         {
-            HitColliders.Add(hit.collider);
-            //si golpeamos una barrera el laser se queda en la posicion del hit, 
-            //de lo contrario se queda en la pocision del objeto que fue golpeado. 
-            if (hit.collider.gameObject.CompareTag("wall"))
-            {
-                Positions.Add(hit.point);
-            }else
-            {
-                Positions.Add(hit.collider.transform.position + Zoffset);
-            }
-            //golpeamos un reflector?
-            if (hit.collider.gameObject.CompareTag("reflector"))
-            {
-                BounceLaser(hit.collider.gameObject.transform); 
-            }
-            //de lo contrario, golpeamos un objeto que implementa ILaser? 
-            else
-            {
-                HitLaserObject(hit); 
-            }
+            ProcessHit(hit);
         }
         //si no hubo golpes el laser sigue de largo y si tenemos un laser object lo eliminamos 
         else
@@ -90,6 +71,55 @@ public class LaserEmisor : MonoBehaviour
             HitLaserObject(hit);
         }
     }
+
+    private void ProcessHit(RaycastHit2D hit)
+    {
+        HitColliders.Add(hit.collider);
+        //si golpeamos una barrera el laser se queda en la posicion del hit, 
+        if (hit.collider.gameObject.CompareTag("wall"))
+        {
+            Positions.Add((Vector3)hit.point + Zoffset * 10);
+        }
+        //golpeamos un espejo?
+        else if (hit.collider.gameObject.CompareTag("mirror"))
+        {
+            //el espejo debe reflejar el vector 
+            var mirrorBounceDirection = Vector2.Reflect( (hit.point - (Vector2)Positions[Positions.Count - 1]).normalized,  hit.normal);
+            Positions.Add((Vector3)hit.point + Zoffset * 10);//agregamos la pocision del espejo. 
+            CastMirrorLaserRay(mirrorBounceDirection); 
+        }
+        //de lo contrario se queda en la pocision del objeto que fue golpeado. 
+        else
+        {
+            Positions.Add(hit.collider.transform.position + Zoffset);
+        }
+
+        //golpeamos un reflector?
+        if (hit.collider.gameObject.CompareTag("reflector"))
+        {
+            BounceLaser(hit.collider.gameObject.transform);
+        }
+        //de lo contrario, golpeamos un objeto que implementa ILaser? 
+        else
+        {
+            HitLaserObject(hit);
+        }
+    }
+
+    private void CastMirrorLaserRay(Vector2 mirrorBounceDirection)
+    {
+        RaycastHit2D hit = Physics2D.Raycast(Positions[Positions.Count - 1] - (Zoffset * 10) + (Vector3) mirrorBounceDirection * 3, mirrorBounceDirection, maxLaserLength); 
+        if(hit.collider != null && !HitColliders.Contains(hit.collider))
+        {
+            ProcessHit(hit); 
+        }
+        else
+        {
+            Positions.Add((Vector3)mirrorBounceDirection * maxLaserLength + Zoffset * 10);
+            HitLaserObject(hit);
+        }
+    }
+
     /// <summary>
     /// Recibe el transform de un reflector, realiza un nuevo raycast 
     /// y agrega los puntos necesarios al array de positions del line renderer. 
@@ -100,28 +130,7 @@ public class LaserEmisor : MonoBehaviour
         RaycastHit2D hit = Physics2D.Raycast(reflector.position + reflector.up * 2, reflector.up, maxLaserLength);
         if (hit.collider != null && !HitColliders.Contains(hit.collider))
         {
-            HitColliders.Add(hit.collider);
-
-            //si golpeamos una barrera el laser se queda en la posicion del hit, 
-            //de lo contrario se queda en la pocision del objeto que fue golpeado. 
-            if (hit.collider.gameObject.CompareTag("wall"))
-            {
-                Positions.Add((Vector3)hit.point + Zoffset * 10);
-            }
-            else
-            {
-                Positions.Add(hit.collider.transform.position + Zoffset);
-            }
-            
-            //golpeamos un reflector?
-            if (hit.collider.gameObject.CompareTag("reflector"))
-            {
-                BounceLaser(hit.collider.gameObject.transform);
-            }
-            else
-            {
-                HitLaserObject(hit);
-            }
+            ProcessHit(hit); 
         }
         else
         {
@@ -129,7 +138,7 @@ public class LaserEmisor : MonoBehaviour
             HitLaserObject(hit);
         }
     }
-    
+
     /// <summary>
     /// Revisa si el hit llego a un objeto que pueda recibir el laser y llama a las funciones adecuadas, 
     /// si no hubo hits limpia la variable de laserObject 

@@ -7,6 +7,8 @@ TagManager:
   - reflector
   - emisor
   - wall
+  - mirror
+  - defusor
   layers:
   - Default
   - TransparentFX
