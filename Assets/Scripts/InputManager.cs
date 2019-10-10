@@ -65,6 +65,7 @@ public class InputManager : MonoBehaviour
             Debug.Log("something hit!");
             if (hit.collider.CompareTag("reflector"))
             {
+                if (hit.collider.gameObject.GetComponent<Rotate>() != null) return; //si el reflector tocado esta rotando automaticamente, no se puede seleccionar. 
                 if (selectedDeflector != null) selectedDeflector.UnSelect();
                 selectedDeflector = hit.collider.GetComponent<Deflector>();
                 selectedDeflector.Select();
