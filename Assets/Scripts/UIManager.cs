@@ -16,7 +16,11 @@ public class UIManager : MonoBehaviour
     public Image energyBar;
     public Image overloadBar;
 
+    
     public GameObject OverloadPauseCanvas;
+    public GameObject contactCanvas;
+    [SerializeField]
+    public Text gameOverDescription; 
 
     private GameManager gameManager;
 
@@ -32,9 +36,21 @@ public class UIManager : MonoBehaviour
         overloadBar.rectTransform.localScale = new Vector3(Overload / 100, 1, 1);
     }
 
-    internal void GameOverScreen()
+    /// <summary>
+    /// Presents the game over screen with the correspondent text: 
+    /// 1 - time up 
+    /// 2 - overload. 
+    /// </summary>
+    /// <param name="type"></param>
+    internal void GameOverScreen(int type)
     {
+        gameOverDescription.text = type == 1 ? "¡SIN ENERGIA!" : "¡SOBRECARGA!";
         OverloadPauseCanvas.SetActive(true);
+    }
+
+    internal void winScreen()
+    {
+        contactCanvas.SetActive(true); 
     }
 
     public void RestarButtonClicked()

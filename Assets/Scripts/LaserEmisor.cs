@@ -23,7 +23,11 @@ public class LaserEmisor : MonoBehaviour
     List<Collider2D> HitColliders;
     ILaser laserObject;
 
-    public bool LaserActive = true; 
+    public bool LaserActive = true;
+    public bool Overloading = false;
+
+    public GameObject particlesContainer;
+    public ParticleSystem Particles; 
 
     private enum LaserDirection
     {
@@ -41,9 +45,21 @@ public class LaserEmisor : MonoBehaviour
     {
         if (LaserActive)
         {
+            Overloading = false; 
             CastLaserRay(); 
             UpdateLineRenderer(); 
-            UpdateRotation(); 
+            UpdateRotation();
+
+            if (Overloading)
+            {
+                particlesContainer.transform.position = Positions[Positions.Count-1];
+                if (!Particles.isPlaying) Particles.Play(); 
+            }
+            else if(Particles.isPlaying) 
+            {
+                Particles.Stop(); 
+            }
+
         }
     }
 
@@ -113,7 +129,13 @@ public class LaserEmisor : MonoBehaviour
         {
             ProcessHit(hit); 
         }
-        else
+        else if (hit.collider != null && HitColliders.Contains(hit.collider))
+        {
+            Overloading = true;
+            Positions.Add((Vector3)hit.point + Zoffset * 10);
+            HitLaserObject(hit);
+        }
+        else 
         {
             Positions.Add((Vector3)mirrorBounceDirection * maxLaserLength + Zoffset * 10);
             HitLaserObject(hit);
@@ -131,6 +153,12 @@ public class LaserEmisor : MonoBehaviour
         if (hit.collider != null && !HitColliders.Contains(hit.collider))
         {
             ProcessHit(hit); 
+        }
+        else if(hit.collider != null && HitColliders.Contains(hit.collider))
+        {
+            Overloading = true; 
+            Positions.Add((Vector3)hit.point + Zoffset * 10);
+            HitLaserObject(hit);
         }
         else
         {
