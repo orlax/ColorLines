@@ -84,15 +84,16 @@ public class GameManager : MonoBehaviour
         if (overloadLevel > 0)
         {
             Overload += OverloadRate*Time.deltaTime;
-            if (Overload > 100)
-            {
-                OverloadScreen(); 
-            }
         }
         else if(Overload>0)
         {
             Overload -= OverloadRate * Time.deltaTime * 1.3f;
             Overload = Mathf.Clamp(Overload, 0, 10000); 
+        }
+
+        if (Overload > 100)
+        {
+            OverloadScreen();
         }
 
         //Actualizar la UI si hay alguna. 

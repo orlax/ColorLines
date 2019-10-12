@@ -26,8 +26,8 @@ public class InputManager : MonoBehaviour
         if (Application.isMobilePlatform)
         {
             touch = (Input.touchCount > 0) && (Input.GetTouch(0).phase == TouchPhase.Began);
-            TouchPos = touch ? Input.GetTouch(0).position : Vector2.zero;
             touching = (Input.touchCount > 0);
+            TouchPos = touching ? Input.GetTouch(0).position : Vector2.zero;
         }
         else {
             touch = Input.GetMouseButtonDown(0);
@@ -51,8 +51,8 @@ public class InputManager : MonoBehaviour
 
     private void UpdateReflectorRotation()
     {
-        Vector2 diff = TouchPos - TouchStartPos;
-        selectedDeflector.transform.eulerAngles = new Vector3(0, 0, startRotation + -.12f * diff.x); 
+        Vector3 diff = TouchPos - TouchStartPos;
+        selectedDeflector.transform.eulerAngles = new Vector3(0, 0, startRotation + -.14f * diff.x); 
         //selectedDeflector.transform.right = (Vector3)TouchPos - selectedDeflector.transform.position; 
     }
 
