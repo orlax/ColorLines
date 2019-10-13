@@ -124,7 +124,7 @@ public class LaserEmisor : MonoBehaviour
 
     private void CastMirrorLaserRay(Vector2 mirrorBounceDirection)
     {
-        RaycastHit2D hit = Physics2D.Raycast(Positions[Positions.Count - 1] - (Zoffset * 10) + (Vector3) mirrorBounceDirection * 3, mirrorBounceDirection, maxLaserLength); 
+        RaycastHit2D hit = Physics2D.Raycast(Positions[Positions.Count - 1] - (Zoffset * 10) + (Vector3) mirrorBounceDirection * 1.4f, mirrorBounceDirection, maxLaserLength); 
         if(hit.collider != null && !HitColliders.Contains(hit.collider))
         {
             ProcessHit(hit); 
@@ -149,7 +149,7 @@ public class LaserEmisor : MonoBehaviour
     /// <param name="reflector"></param>
     private void BounceLaser(Transform reflector)
     {
-        RaycastHit2D hit = Physics2D.Raycast(reflector.position + reflector.up * 2, reflector.up, maxLaserLength);
+        RaycastHit2D hit = Physics2D.Raycast(reflector.position + reflector.up * 1.2f, reflector.up, maxLaserLength);
         if (hit.collider != null && !HitColliders.Contains(hit.collider))
         {
             ProcessHit(hit); 

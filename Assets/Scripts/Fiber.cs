@@ -27,8 +27,10 @@ public class Fiber : LaserEmisor, ILaser
 
     public void GetLaser(bool laser)
     {
-        isBeingHit = laser;
-        if (OutFiber) OutFiber.SetOut(laser); 
+        if (!isOut) {
+            isBeingHit = laser;
+            if (OutFiber) OutFiber.SetOut(laser); 
+        }
     }
 
     public void SetOut(bool newOut)
