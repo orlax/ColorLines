@@ -116,22 +116,19 @@ public class LaserEmisor : MonoBehaviour
             BounceLaser(hit.collider.gameObject.transform);
         }
         //de lo contrario, golpeamos un objeto que implementa ILaser? 
-        else
-        {
-            HitLaserObject(hit);
-        }
-    }
+        HitLaserObject(hit);
+     }
 
     private void CastMirrorLaserRay(Vector2 mirrorBounceDirection)
     {
-        RaycastHit2D hit = Physics2D.Raycast(Positions[Positions.Count - 1] - (Zoffset * 10) + (Vector3) mirrorBounceDirection * 3, mirrorBounceDirection, maxLaserLength); 
-        if(hit.collider != null && !HitColliders.Contains(hit.collider))
+        RaycastHit2D hit = Physics2D.Raycast(Positions[Positions.Count - 1] - (Zoffset * 10) + (Vector3) mirrorBounceDirection * 1.4f, mirrorBounceDirection, maxLaserLength); 
+        if(hit.collider != null && (!HitColliders.Contains(hit.collider) || hit.collider.CompareTag("mirror")))
         {
             ProcessHit(hit); 
         }
         else if (hit.collider != null && HitColliders.Contains(hit.collider))
         {
-            Overloading = true;
+            if (!hit.collider.CompareTag("mirror")) Overloading = true;
             Positions.Add((Vector3)hit.point + Zoffset * 10);
             HitLaserObject(hit);
         }
@@ -149,14 +146,14 @@ public class LaserEmisor : MonoBehaviour
     /// <param name="reflector"></param>
     private void BounceLaser(Transform reflector)
     {
-        RaycastHit2D hit = Physics2D.Raycast(reflector.position + reflector.up * 2, reflector.up, maxLaserLength);
-        if (hit.collider != null && !HitColliders.Contains(hit.collider))
+        RaycastHit2D hit = Physics2D.Raycast(reflector.position + reflector.up * 1.2f, reflector.up, maxLaserLength);
+        if (hit.collider != null && (!HitColliders.Contains(hit.collider) || hit.collider.CompareTag("mirror")))
         {
             ProcessHit(hit); 
         }
-        else if(hit.collider != null && HitColliders.Contains(hit.collider))
+        else if(hit.collider != null && HitColliders.Contains(hit.collider) )
         {
-            Overloading = true; 
+            if(!hit.collider.CompareTag("mirror")) Overloading = true; 
             Positions.Add((Vector3)hit.point + Zoffset * 10);
             HitLaserObject(hit);
         }
