@@ -12,8 +12,8 @@ public class Destructible : MonoBehaviour, ILaser
     Animator animator;
     
     public bool isBeingHit = false;
-    public bool isAlive = true; 
-
+    public bool isAlive = true;
+    public AudioSource hited; 
 
     // Start is called before the first frame update
     void Start()
@@ -24,8 +24,13 @@ public class Destructible : MonoBehaviour, ILaser
 
     public void GetLaser(bool laser)
     {
+        if(!isBeingHit && laser){
+            hited.Play(); 
+        }
+        
         isBeingHit = laser;
         animator.SetBool("isBeingHit", isBeingHit);
+        
     }
 
     /// <summary>

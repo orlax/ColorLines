@@ -19,9 +19,16 @@ public class GameManager : MonoBehaviour
     private int overloadLevel = 0;
 
     Undestructible[] undestructibles;
-    LaserEmisor[] emisors; 
+    LaserEmisor[] emisors;
 
+    
     UIManager UI;
+
+    //implementacion de sonido a ultimo minuto yay! 
+    [Header("Sonidos")]
+    public AudioSource winSound;
+    public AudioSource overloadSound;
+    public AudioSource cantWin; 
 
     /// <summary>
     /// Revisa el estado de todos los destructibles y  segun este aumenta o disminuye el nivel de overload 
@@ -57,14 +64,16 @@ public class GameManager : MonoBehaviour
             if (d.isAlive) {
                 canWin = false;
                 d.Shake();
+                if (!cantWin.isPlaying) cantWin.Play(); 
             } 
         }
         //si no quedan destructibles en el nivel, hemos ganado. 
-        if (canWin)
+        if (canWin && !GameOver)
         {
             UI?.winScreen();
             GameOver = true;
-            Invoke("LoadNextLevel", 4f); 
+            Invoke("LoadNextLevel", 4f);
+            winSound.Play(); 
         }
     }
 
@@ -84,11 +93,14 @@ public class GameManager : MonoBehaviour
         if (overloadLevel > 0)
         {
             Overload += OverloadRate*Time.deltaTime;
+            if (!overloadSound.isPlaying) overloadSound.Play(); 
         }
         else if(Overload>0)
         {
             Overload -= OverloadRate * Time.deltaTime * 1.3f;
-            Overload = Mathf.Clamp(Overload, 0, 10000); 
+            Overload = Mathf.Clamp(Overload, 0, 10000);
+            if (overloadSound.isPlaying) overloadSound.Stop();
+
         }
 
         if (Overload > 100)
@@ -102,6 +114,7 @@ public class GameManager : MonoBehaviour
             UI.Energy = Energy;
             UI.Overload = Overload; 
         }
+
     }
 
     internal void RestartLevel()
