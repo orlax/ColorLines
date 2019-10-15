@@ -25,7 +25,7 @@ mecanicas del deflektor original que no fueron replicadas:
 - los bugs que avanzan de forma aleatoria en el espacio y causan cambios en los reflectors. 
 - distintas clases de prismas que cambian la direccion del laser de forma secuencial o aleatoria. 
 
-Con mas tiempo para desarrollar esta prueba, una lista de cosas por hacer seria: 
+Con mas tiempo para desarrollar este juego, una lista de cosas por hacer seria: 
 
 - resolver bugs en casos de eje que provocan a el laser a quedarse "pegado" en ciertos objetos, aveces causando una sobrecarga mas rapido de lo normal. 
 - agregar mas y mejores niveles. 
